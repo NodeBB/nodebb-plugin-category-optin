@@ -1,0 +1,7 @@
+{
+    "library": "./index.js",
+    "hooks": [
+        { "hook": "action:category.create", "method": "onCategoryCreate"},
+        { "hook": "action:user.create", "method": "onUserCreate"}
+    ]
+}
