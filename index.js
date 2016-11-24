@@ -16,7 +16,17 @@ plugin.onCategoryCreate = function(categoryData) {
 		var keys = uids.map(function(uid) {
 			return 'uid:' + uid + ':ignored:cids';
 		});
-		db.sortedSetsAdd(keys, now, categoryData.cid, next);
+		var nowArray = uids.map(function() {
+			return now;
+		});
+		async.parallel([
+			function (next) {
+				db.sortedSetsAdd(keys, now, categoryData.cid, next);
+			},
+			function (next) {
+				db.sortedSetAdd('cid:' + categoryData.cid + ':ignorers', nowArray, uids, next);
+			}
+		], next);
 	}, {batch: 500}, function(err) {
 		if (err) {
 			winston.error(err);
@@ -34,7 +44,17 @@ plugin.onUserCreate = function(userData) {
 			var nowArray = cids.map(function() {
 				return now;
 			});
-			db.sortedSetAdd('uid:' + userData.uid + ':ignored:cids', nowArray, cids, next);
+			async.parallel([
+				function (next) {
+					db.sortedSetAdd('uid:' + userData.uid + ':ignored:cids', nowArray, cids, next);
+				},
+				function (next) {
+					var keys = cids.map(function (cid) {
+						return 'cid:' + cid + ':ignorers';
+					});
+					db.sortedSetsAdd(keys, now, userData.uid, next);
+				}
+			], next);
 		}
 	], function(err) {
 		if (err) {
