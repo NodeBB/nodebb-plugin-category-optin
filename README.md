@@ -1,3 +1,5 @@
+# DO NOT USE THIS PLUGIN
+
 # NodeBB Plugin Category Opt In
 
 A plugin that ignores all categories for users.
